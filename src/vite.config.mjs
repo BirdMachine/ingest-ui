@@ -1,3 +1,5 @@
+import {createDemoApi} from '../demo/api.mjs';
+import {mockMiddleware} from '../demo/node.mjs';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -46,6 +48,7 @@ export default defineConfig(({ command, mode }) => {
     'REACT_APP_',
   ]);
   const isBuild = command === 'build';
+  const isDemo = mode === 'demo';
   const clientEnv = Object.fromEntries(
     Object.entries(loadedEnv).filter(([key]) => key.startsWith('REACT_APP_'))
   );
@@ -55,6 +58,14 @@ export default defineConfig(({ command, mode }) => {
     NODE_ENV: isBuild ? 'production' : 'development',
     PUBLIC_URL: '.',
     npm_package_version: packageJson.version,
+    ...(isDemo ? {
+      REACT_APP_DEMO_MODE: 'true', REACT_APP_NODE_ENV: 'demo',
+      REACT_APP_DATAINGEST_API_URL: '/mock/ingest', REACT_APP_ENTITY_API_URL: '/mock/entity',
+      REACT_APP_SEARCH_API_URL: '/mock/search', REACT_APP_UBKG_API_URL: '/mock/ontology',
+      REACT_APP_GATEWAY_STATUS_URL: '/mock/status', REACT_APP_DATASET_QUERY_PARAM: '',
+      REACT_APP_URL: '', REACT_APP_PROFILE_URL: '#', REACT_APP_DATA_PORTAL_URL: '#',
+      REACT_APP_INGEST_BOARD_URL: '#', REACT_APP_DATADOG_APP_ID: '', REACT_APP_DATADOG_CLIENT_TOKEN: '',
+    } : {}),
   };
 
   return {
@@ -64,6 +75,16 @@ export default defineConfig(({ command, mode }) => {
       'process.env': JSON.stringify(processEnv),
     },
     plugins: [
+      ...(isDemo ? [{
+        name: 'synthetic-demo-api',
+        configureServer(server) {server.middlewares.use(mockMiddleware(createDemoApi()));},
+        configurePreviewServer(server) {server.middlewares.use(mockMiddleware(createDemoApi()));},
+        transformIndexHtml(html) {
+          return html.replace(/<script async src="https:\/\/www\.googletagmanager[^]*?<\/script>\s*<script>[^]*?<\/script>/, '')
+            .replace(/<script src="https:\/\/cdn\.humanatlas[^]*?<\/script>/, '')
+            .replace('<title>HuBMAP Ingest Portal</title>', '<title>Ingest UI · Portfolio Demo</title>');
+        },
+      }] : []),
       mirrorAppCssToAssets(),
       printReactVersionOnStart(),
       react({
@@ -77,7 +98,7 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       host: '0.0.0.0',
-      port: Number(loadedEnv.PORT || 8585),
+      port: Number(process.env.PORT || loadedEnv.PORT || 8585),
     },
     build: {
       assetsDir: 'static',

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: birdmachine-ingest-demo
+    runtime: node
+    plan: free
+    branch: demo/mock-server
+    buildCommand: CYPRESS_INSTALL_BINARY=0 npm --prefix src ci --ignore-scripts --include=dev && npm run build:demo
+    startCommand: npm start
+    healthCheckPath: /mock/status
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: GENERATE_SOURCEMAP
+        value: "false"
