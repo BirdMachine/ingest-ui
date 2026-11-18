@@ -24,7 +24,7 @@ export function gatewayServiceHealth(data = {}) {
 
 export function gateway_api_status() { 
   return axios
-    .get(`https://gateway.api.hubmapconsortium.org/status.json`)
+    .get(process.env.REACT_APP_GATEWAY_STATUS_URL || `https://gateway.api.hubmapconsortium.org/status.json`)
       .then(res => {
         console.debug("gateway_api_status RES", res.status, res.data);
         return {status: res.status, results: gatewayServiceHealth(res.data)};

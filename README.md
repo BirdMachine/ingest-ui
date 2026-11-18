@@ -1,5 +1,7 @@
 # HuBMAP Data Ingest Portal
 
+**Portfolio demo:** See [DEMO.md](DEMO.md) for a one-command mock server using fictional data. Demo changes are on `demo/mock-server`; `main` preserves BirdMachine's last upstream commit.
+
 The HuBMAP Data Ingest Portal UI is a web application built with [React](https://reactjs.org/) on [Nodejs v14 (includes npm)](https://nodejs.org/en/download/). It interacts with the backend APIs (ingest-api, entity-api, and search-api) to register Donor/Sample/Dataset/Upload and makes them searchable (via search-api).
 
 ## Configuration and local development

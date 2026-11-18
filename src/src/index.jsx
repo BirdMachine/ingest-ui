@@ -8,14 +8,23 @@ import {installDevToolHotkeys} from "./utils/dev_tool_manager";
 async function startApp() {
   if (!prepareVersionedStorage()) return;
 
+  let DemoBanner;
+  if (process.env.REACT_APP_DEMO_MODE === 'true') {
+    const demo = await import('./demo');
+    demo.prepareDemo();
+    DemoBanner = demo.DemoBanner;
+  }
   installDevToolHotkeys();
   const {default: App} = await import("./App");
   const root = createRoot(document.getElementById("root"));
 
   root.render(
-    <BrowserRouter forceRefresh={true}>
-      <App />
-    </BrowserRouter>
+    <>
+      {DemoBanner && <DemoBanner />}
+      <BrowserRouter forceRefresh={true}>
+        <App />
+      </BrowserRouter>
+    </>
   );
 }
 

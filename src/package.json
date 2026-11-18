@@ -71,7 +71,9 @@
     "verify:production-routing": "node ./scripts/verify-production-routing.js",
     "verify:react19": "npm run lint && npm run test:v && npm run build && npm run build:tags && npm run verify:production-routing",
     "verify:docker-config": "cd ../docker && ./docker-development.sh config",
-    "verify:docker-build": "cd ../docker && ./docker-development.sh build"
+    "verify:docker-build": "cd ../docker && ./docker-development.sh build",
+    "demo": "vite --mode demo",
+    "build:demo": "vite build --mode demo"
   },
   "browserslist": {
     "production": [
